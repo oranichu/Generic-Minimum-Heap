@@ -3,4 +3,4 @@ project(minHeap)
 
 set(CMAKE_CXX_STANDARD 98)
 
-add_executable(minHeap main.cpp minHeap.h)
+add_executable(minHeap main.cpp MinHeap.h)
