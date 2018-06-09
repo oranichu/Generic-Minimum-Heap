@@ -23,10 +23,11 @@ std::ostream& operator<<(std::ostream &os,SaveIndex* s) {
 
 class DoNothing {
 public:
-    void operator()(SaveIndex* a,int j){
-        a->setIndex(j) ;
+    void operator()(SaveIndex *a, int j) {
+        a->setIndex(j);
     }
 };
+
 
 void printArr(SaveIndex *arr[])  {
     for (int i = 0; i < 10; i++) {
@@ -56,19 +57,24 @@ int main() {
         data2[i]=new SaveIndex(key[i]);
     }
 
-    MinHeap<SaveIndex*,int,DoNothing> h (data1,key,4,DoNothing()) ;
+    MinHeap<SaveIndex*,int,DoNothing> h2 (data2,key,10,-1,DoNothing()) ;
 
-
-    h.insert(data1[4],key[4]);
-
-    for (int i=5 ; i< 10 ; i++) {
-        h.insert(data1[i],key[i]);
-    }
-
-    printArr(data1);
-
-    MinHeap<SaveIndex*,int,DoNothing> h2 (data2,key,10,DoNothing()) ;
     printArr(data2);
+
+    h2.delMin();
+    h2.delNode(8);
+    h2.delNode(8);
+    h2.delNode(8);
+    h2.delNode(8);
+    h2.delNode(8);
+    h2.delNode(2);
+
+
+    printArr(data2);
+
+    h2.printHeap();
+
+
 
 
     return 0;

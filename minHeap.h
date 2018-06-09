@@ -6,10 +6,16 @@
 class MinHeapException : public std::exception {
 };
 
-class badArgument : public MinHeapException {
+class BadArgument : public MinHeapException {
 public:
     virtual const char *what() const throw() {
         return "Invalid Argument";
+    };
+};
+
+class NoElements : public MinHeapException {
+    virtual const char *what() const throw() {
+        return "No Min in heap , there are no elements.";
     };
 };
 
@@ -41,6 +47,8 @@ private:
 
     int size; //Total array size.
     int last; //The index of the last node , last <= size always ! .
+    //Minimum key value for delete , needs to be smaller than all possible keys.
+    U minKeyVal;
     MinHeapNode **arr;
     Func updateIndexFunc;
 
@@ -71,12 +79,22 @@ private:
         return -1;//father is leaf or smaller than left son.
     }
 
+    void expandArray() {
+        size *= size;
+        MinHeapNode **temp = new MinHeapNode *[size];
+        for (int i = 1; i <= last; i++) {
+            temp[i] = arr[i];
+        }
+        delete[]arr;
+        arr = temp;
+    }
+
 public:
     //T and U array sizes must be in size of n !
-    MinHeap(const T *dataArr, const U *keyArr, int n, const Func &f)
-            : size(4 * n), last(n), updateIndexFunc(f) {
+    MinHeap(const T *dataArr, const U *keyArr, int n, int minKey, const Func &f)
+            : size(4 * n), last(n), minKeyVal(minKey), updateIndexFunc(f) {
         if (n < 1 || dataArr == NULL || keyArr == NULL) {
-            throw badArgument();
+            throw BadArgument();
         }
         arr = new MinHeapNode *[size];
         for (int i = 1; i <= last; i++) {
@@ -89,6 +107,13 @@ public:
         }
     };
 
+    ~MinHeap() {
+        for (int i = 1; i <= last; i++) {
+            delete arr[i];
+        }
+        delete[] arr;
+    }
+
     void siftDown(int i) {
         int smaller_son_index = sonToSwitch(i);
         if (smaller_son_index == -1) {
@@ -98,13 +123,24 @@ public:
         siftDown(smaller_son_index);
     }
 
+    void siftUp(int i) {
+        if (i <= 1) { //reached the top.
+            return;
+        }
+        if (arr[i]->getKey() > arr[i / 2]->getKey()) {
+            return; //he's bigger than his father , stop .
+        }
+        switchNodes(i, i / 2);
+        siftUp(i / 2);
+    }
+
     int getSize() const { return size; };
 
     int getLastIndex() const { return last; };
 
     const T &getMin() const {
-        if (arr == NULL) {
-            return NULL;
+        if (arr == NULL || last == 0) {
+            throw NoElements();
         }
         return arr[1]->getData();
     }
@@ -114,6 +150,38 @@ public:
             std::cout << arr[i]->getData() << " ";
         }
         std::cout << std::endl;
+    }
+
+    void insert(const T &new_data, const U &new_key) {
+        if ((++last) >= size / 2) {
+            expandArray();
+        }
+        arr[last] = new MinHeapNode(new_data, new_key);
+        updateIndexFunc(new_data, last);
+        siftUp(last);
+    }
+
+    void delMin() {
+        if (last == 1) {
+            updateIndexFunc(arr[last]->getData(), -1);//puts -1 in data index.
+            delete arr[last];
+            last--;
+            return;
+        }
+        switchNodes(1, last);
+        updateIndexFunc(arr[last]->getData(), -1);
+        delete arr[last];
+        last--;
+        siftDown(1);
+    }
+
+    void delNode(int i) {
+        if (i > last) {
+            return;
+        }
+        arr[i]->setKey(minKeyVal);
+        siftUp(i);
+        delMin();
     }
 
 
