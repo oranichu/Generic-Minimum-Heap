@@ -1,24 +1,28 @@
 #include <iostream>
+#include <cstdlib>
 #include "MinHeap.h"
 
 
 class SaveIndex {
-    int data ;
-    int index ;
+    int data;
+    int index;
 public:
-    SaveIndex(int d) : data(d), index(0) {} ;
-    void setData(int i) {data = i ;};
-    int getData() {return data ;} ;
+    SaveIndex(int d) : data(d), index(0) {};
 
-    void setIndex(int i) {index = i ;};
-    int getIndex() {return index ;} ;
+    void setData(int i) { data = i; };
 
-    friend std::ostream& operator<<(std::ostream& os,SaveIndex s);
+    int getData() { return data; };
+
+    void setIndex(int i) { index = i; };
+
+    int getIndex() { return index; };
+
+    friend std::ostream &operator<<(std::ostream &os, SaveIndex s);
 
 };
 
-std::ostream& operator<<(std::ostream &os,SaveIndex* s) {
-    return os<<s->getData() ;
+std::ostream &operator<<(std::ostream &os, SaveIndex *s) {
+    return os << s->getData();
 }
 
 class DoNothing {
@@ -29,12 +33,12 @@ public:
 };
 
 
-void printArr(SaveIndex *arr[])  {
+void printArr(SaveIndex *arr[]) {
     for (int i = 0; i < 10; i++) {
         std::cout << arr[i]->getData() << " ";
     }
     std::cout << std::endl;
-    std::cout << "**********************"<< std::endl;
+    std::cout << "**********************" << std::endl;
 
     for (int i = 0; i < 10; i++) {
         std::cout << arr[i]->getIndex() << " ";
@@ -43,39 +47,40 @@ void printArr(SaveIndex *arr[])  {
 }
 
 
-
 int main() {
 
-    int key[10] = {6,8,12,17,0,3,10,4,5,2};
-    SaveIndex *data1[10] ;
-    for (int i=0 ; i< 10 ; i++) {
-        data1[i]=new SaveIndex(key[i]);
+    int key[500];
+    SaveIndex *data1[500];
+    for (int i = 0; i < 500; i++) {
+        key[i] = rand() % 500 + 1;
+    }
+    for (int i = 0; i < 500; i++) {
+        data1[i] = new SaveIndex(key[i]);
     }
 
-    SaveIndex *data2[10] ;
-    for (int i=0 ; i< 10 ; i++) {
-        data2[i]=new SaveIndex(key[i]);
+    MinHeap<SaveIndex *, int, DoNothing> h2(data1, key, 30, -1, DoNothing());
+
+    for (int i = 30; i < 500; i++) {
+        h2.insert(data1[i], key[i]);
     }
-
-    MinHeap<SaveIndex*,int,DoNothing> h2 (data2,key,10,-1,DoNothing()) ;
-
-    printArr(data2);
-
-    h2.delMin();
-    h2.delNode(8);
-    h2.delNode(8);
-    h2.delNode(8);
-    h2.delNode(8);
-    h2.delNode(8);
-    h2.delNode(2);
-
-
-    printArr(data2);
-
-    h2.printHeap();
-
-
-
+    int min = 501;
+    int minIndex = -1;
+    for (int j = 0; j < 500; j++) {
+        for (int i = 0; i < 500; i++) {
+            if (key[i] < min) {
+                min = key[i];
+                minIndex = i;
+            }
+        }
+        if ((h2.getMin()->getData()!=min) || (h2.getMin()->getIndex()!=1) ) {
+            std::cout << "************** FALSEEE ***********" << std::endl ;
+        }
+        std::cout << key[minIndex] << " " ;
+        key[minIndex] = 501 ;
+        min = 501 ;
+        minIndex =-1 ;
+        h2.delMin();
+    }
 
     return 0;
 }
