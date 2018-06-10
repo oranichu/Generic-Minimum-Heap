@@ -82,7 +82,7 @@ private:
     void expandArray() {
         size *= 2;
         MinHeapNode **temp = new MinHeapNode *[size];
-        for (int i = 1; i <= last; i++) {
+        for (int i = 1; i < last; i++) {
             temp[i] = arr[i];
         }
         delete[]arr;
